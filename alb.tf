@@ -40,13 +40,19 @@ resource "aws_lb" "alb" {
 
 resource "aws_alb_target_group" "group" {
   name     = "terraform-example-alb-target"
-  port     = 80
+  port     = "80"
   protocol = "HTTP"
   vpc_id   = "${aws_vpc.vpc-dev.id}"
   # Alter the destination of the health check to be the login page.
   health_check {
-    path = "/"
-    port = 80
+    healthy_threshold   = "3"
+    unhealthy_threshold = "2"
+    interval            = "20"
+    protocol            = "HTTP" # <---- it has to be with quotes and uppercase
+    matcher             = "200"
+    timeout             = "10"
+    path                = "/"
+    port = "80"
   }
 }
 

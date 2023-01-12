@@ -21,8 +21,8 @@ resource "aws_launch_configuration" "as_conf"{
 resource "aws_autoscaling_group" "autoscale_group" {
   name                 = "terraform-test"
   launch_configuration = "${aws_launch_configuration.as_conf.id}"
-#  vpc_zone_identifier = ["${aws_subnet.vpc-dev-private-subnet-1.id}","${aws_subnet.vpc-dev-private-subnet-2.id}"]
-  availability_zones = "${var.avail_zones[*]}" 
+  vpc_zone_identifier =  aws_subnet.private.*.id
+#  availability_zones = "${var.avail_zones[*]}" 
   min_size = 1
   max_size = 3
   health_check_grace_period = 300
@@ -38,5 +38,7 @@ resource "aws_autoscaling_group" "autoscale_group" {
 
 resource "aws_autoscaling_attachment" "asg_attachment_bar" {
   autoscaling_group_name = aws_autoscaling_group.autoscale_group.id
-  elb                    = aws_lb.alb.id
+#  elb                    = aws_lb.alb.id
+  alb_target_group_arn   = aws_alb_target_group.group.arn
+  depends_on =  [aws_lb.alb]
 }
